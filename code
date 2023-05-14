@@ -1,0 +1,265 @@
+import java.io.*;
+import java.math.*;
+import java.security.*;
+import java.text.*;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.function.*;
+import java.util.regex.*;
+import java.util.stream.*;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
+
+
+
+class Result {
+
+    /*
+     * Complete the 'targetsWithMostArrows' function below.
+     *
+     * The function is expected to return a STRING.
+     * The function accepts following parameters:
+     *  1. INTEGER size
+     *  2. STRING targets
+     */
+
+    public static int hit(boolean[][] array, int size, String target, ArrayList<String> border) {
+        int targetRow = Character.getNumericValue(target.charAt(0));
+        int targetCol = Character.getNumericValue(target.charAt(1));
+        int tempRow = targetRow;
+        int tempCol = targetCol; 
+        
+        int targetNumber = 0;
+        
+        //A
+        while (tempCol > 0) {
+            tempCol--;
+            if (array[targetRow][tempCol] == true) {
+                break;
+            }
+            if (border.contains(Integer.toString(targetRow) + Integer.toString(tempCol))) {
+                targetNumber++;
+            }
+        }
+        
+        tempCol = targetCol;
+        
+        //B
+        while (tempRow > 0) {
+            tempRow--;
+            if (array[tempRow][targetCol] == true) {
+                break;
+            }
+            if (border.contains(Integer.toString(tempRow) + Integer.toString(targetCol))) {
+                targetNumber++;
+            }
+        }
+        
+        tempRow = targetRow;
+        
+        //C
+        while (tempCol < (size-1)) {
+            tempCol++;
+            if (array[targetRow][tempCol] == true) {
+                break;
+            }
+            if (border.contains(Integer.toString(targetRow) + Integer.toString(tempCol))) {
+                targetNumber++;
+            }
+        }
+        
+        tempCol = targetCol;
+        
+        //D
+        while (tempRow < (size-1)) {
+            tempRow++;
+            if (array[tempRow][targetCol] == true) {
+                break;
+            }
+            if (border.contains(Integer.toString(tempRow) + Integer.toString(targetCol))) {
+                targetNumber++;
+            }
+        }
+        
+        tempRow = targetRow;
+        
+        //E
+        while ((tempCol > 0) && (tempRow > 0)) {
+            tempRow--;
+            tempCol--;
+            if (array[tempRow][tempCol] == true) {
+                break;
+            }
+            if (border.contains(Integer.toString(tempRow) + Integer.toString(tempCol))) {
+                targetNumber++;
+            }
+        }
+        
+        tempRow = targetRow;
+        tempCol = targetCol;
+        
+        //F
+        while ((tempCol < size - 1) && (tempRow > 0)) {
+            tempRow--;
+            tempCol++;
+            if (array[tempRow][tempCol] == true) {
+                break;
+            }
+            if (border.contains(Integer.toString(tempRow) + Integer.toString(tempCol))) {
+                targetNumber++;
+            }
+        }
+        
+        tempRow = targetRow;
+        tempCol = targetCol;
+        
+        //G
+        while ((tempCol < (size-1)) && (tempRow < (size-1))) {
+            tempRow++;
+            tempCol++;
+            if (array[tempRow][tempCol] == true) {
+                break;
+            }
+            if (border.contains(Integer.toString(tempRow) + Integer.toString(tempCol))) {
+                targetNumber++;
+            }
+        }
+        
+        tempRow = targetRow;
+        tempCol = targetCol;
+        
+        //H
+        while ((tempCol > 0) && (tempRow < (size-1))) {
+            tempRow++;
+            tempCol--;
+            if (array[tempRow][tempCol] == true) {
+                break;
+            }
+            if (border.contains(Integer.toString(tempRow) + Integer.toString(tempCol))) {
+                targetNumber++;
+            }
+        }
+        
+        return targetNumber;
+    }
+    
+    
+    public static String targetsWithMostArrows(int size, String targets) {
+        ArrayList<String> border = new ArrayList<String>();
+        for (int j=0; j<size; j++) {
+            String str1 = Integer.toString(j);
+            border.add("0" + str1);
+            border.add(Integer.toString(size-1) + str1);
+        }
+        for (int i=1; i<size-1; i++) {
+            String str2 = Integer.toString(i);
+            border.add(str2 + "0");
+            border.add(str2 + Integer.toString(size-1));
+        }
+        
+        /*for (String a : border) {
+            System.out.println(a);
+        }*/
+        
+        
+        String[] strArray = targets.split(" ");
+        /*for (String str : strArray) {
+            System.out.println(str);
+        }*/
+        
+        boolean[][] array = new boolean[size][size];
+        
+        for (int i=0; i<size; i++) {
+            for (int j=0; j<size; j++) {
+                array[i][j] = false;
+            }
+        }
+        
+        
+        for (String str : strArray) {
+            array[Character.getNumericValue(str.charAt(0))][Character.getNumericValue(str.charAt(1))] = true;
+        }
+        
+        /*for (boolean[] k : array) {
+            for (boolean j : k) {
+                System.out.println(j);
+            }
+        }*/
+        
+        
+        
+        int max = 0;
+        ArrayList<String> answer = new ArrayList<String>();
+        
+        
+        for(String str : strArray) {
+            int hitNumber = hit(array, size, str, border);
+            if (hitNumber < max) {
+                continue;
+            }
+            else if (hitNumber > max) {
+                max = hitNumber;
+                answer.clear();
+                answer.add(str);
+            }
+            else if (hitNumber == max) {
+                answer.add(str);
+            }
+        }
+        
+        //for (String a : answer) {
+        //    System.out.println(a);
+        //}
+        
+        
+        String answerStr = "";
+        int min = 1000;
+        int minIndex = -1;
+        if (answer.size() == 1) {
+                answerStr = answer.get(0);
+                answer.remove(0);
+        }
+        
+        
+        while (!answer.isEmpty()) {
+            for (int i = 0; i<answer.size(); i++) {
+                if (min < Integer.parseInt(answer.get(i))) {
+                    continue;
+                }
+                else {
+                    minIndex = i;
+                    min = Integer.parseInt(answer.get(i));
+                }                
+                
+            }
+            System.out.println("min" + Integer.toString(min));
+            answerStr = answerStr + Integer.toString(min) + " ";
+            answer.remove(minIndex);
+            for (String a : answer) {
+                System.out.println(a);
+            }
+            min = 1000;
+        }
+        return answerStr;
+    }
+
+}
+
+public class Solution {
+    public static void main(String[] args) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(System.getenv("OUTPUT_PATH")));
+
+        int size = Integer.parseInt(bufferedReader.readLine().trim());
+
+        String targets = bufferedReader.readLine();
+
+        String result = Result.targetsWithMostArrows(size, targets);
+
+        bufferedWriter.write(result);
+        bufferedWriter.newLine();
+
+        bufferedReader.close();
+        bufferedWriter.close();
+    }
+}
